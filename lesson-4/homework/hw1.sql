@@ -54,7 +54,6 @@ INSERT INTO Employees (EmployeeID, FirstName, LastName, DepartmentName, Salary, 
 (39, 'Angela', 'Jenkins', 'Finance', 52000.00, '2018-04-23', 34, 'angelaj@example.com', 'Canada'),
 (40, 'Gary', 'Wright', 'Marketing', 87000.00, '2021-01-10', 29, NULL, 'UK');
 
-
 DROP TABLE IF EXISTS Products_Discounted;
 
 CREATE TABLE Products_Discounted (
@@ -106,10 +105,6 @@ INSERT INTO Products_Discounted VALUES
 (38, 'Cold Press Juicer', 50.00, 'Electronics', 28),
 (39, 'Smart Toaster', 36.00, 'Electronics', 65),
 (40, 'Compact Dishwasher', 470.00, 'Electronics', 18);
-
-
-
-
 
 DROP TABLE IF EXISTS Sales;
 
@@ -168,8 +163,6 @@ DROP TABLE IF EXISTS Orders;
 DROP TABLE IF EXISTS Products;
 DROP TABLE IF EXISTS Customers;
 
-
-
 CREATE TABLE Products (
     ProductID INT PRIMARY KEY,
     ProductName VARCHAR(100),
@@ -219,11 +212,6 @@ INSERT INTO Products VALUES
 (38, 'Juicer', 55.00, 'Electronics', 30),
 (39, 'Toaster', 40.00, 'Electronics', 70),
 (40, 'Dishwasher', 500.00, 'Electronics', 20);
-
-
-
-
-
 
 CREATE TABLE Customers (
     CustomerID INT PRIMARY KEY,
@@ -336,6 +324,7 @@ INSERT INTO Orders VALUES
 (39, 39, 40, '2023-11-26', 3, 120.00),
 (40, 40, 1, '2024-03-09', 1, 1200.00);
 
+
 -- 1.
 SELECT TOP 5 
     *
@@ -377,12 +366,12 @@ SELECT
     *
 FROM
     Employees
-ORDER BY
-    Salary >= 60000 and Department = 'HR';
+WHERE
+    Salary >= 60000 and DepartmentName = 'HR';
 
 -- 7.
 SELECT
-    EmpID,
+    EmployeeID,
     FirstName,
     LastName,
     ISNULL(Email, 'noemail@example.com') AS Email
@@ -411,6 +400,7 @@ FROM
 ORDER BY
     ProductName DESC;
 
+
 -- 11.
 SELECT TOP 10
     *
@@ -421,7 +411,7 @@ ORDER BY
 
 -- 12.
 SELECT 
-    EmpID,
+    EmployeeID,
     COALESCE(FirstName, LastName) AS Name
 FROM
     Employees;
@@ -438,7 +428,7 @@ SELECT
 FROM
     Employees
 WHERE
-    (Age BETWEEN 30 AND 40) OR Department = 'Marketing';
+    (Age BETWEEN 30 AND 40) OR DepartmentName = 'Marketing';
 
 -- 15.
 SELECT
@@ -458,9 +448,9 @@ SELECT
 FROM
     Products
 WHERE
-    Price <= 1000 AND Stock > 50
+    Price <= 1000 AND StockQuantity > 50
 ORDER BY
-    Stock ASC;
+    StockQuantity ASC;
 
 -- 17.
 SELECT 
@@ -476,53 +466,80 @@ SELECT
 FROM
     Employees
 WHERE
-    Department IN ('HR', 'IT', 'Finance');
+    DepartmentName IN ('HR', 'IT', 'Finance');
 
 -- 19.
-ALTER TABLE 
-    Customers
-ADD 
-    City VARCHAR(100),
-    PostalCode VARCHAR(20);
-
-UPDATE 
-    Customers
-SET 
-    City = 'New York', PostalCode = '10001'
-WHERE 
-    FirstName = 'Alice';
-
-UPDATE
-    Customers
-SET
-    City = 'Los Angeles', PostalCode = '90001'
-WHERE
-    FirstName = 'Bob';
-
-UPDATE
-    Customers
-SET
-    City = 'Chicago', PostalCode = '60601'
-WHERE
-    FirstName = 'Amanda';
-
-UPDATE
-    Customers
-SET
-    City = 'New York', PostalCode = '10002'
-WHERE
-    FirstName = 'Daniel';
-
-UPDATE
-    Customers
-SET
-    City = 'Chicago', PostalCode = '60602'
-WHERE
-    FirstName = 'Andrew';
-
 SELECT
     *
 FROM
     Customers
 ORDER BY
     City ASC, PostalCode DESC;
+
+-- 20.
+SELECT
+    *
+FROM
+    Products
+WHERE
+    ProductID IN(SELECT TOP(5) ProductID FROM Sales GROUP BY ProductID ORDER BY SUM(SaleAmount) DESC);
+
+SELECT 
+    EmployeeID,
+    CONCAT(FirstName, ' ', LastName) AS FullName,
+    DepartmentName,
+    Salary,
+    HireDate,
+    Age,
+    Email,
+    Country
+FROM
+    Employees;
+
+-- 22.
+SELECT DISTINCT
+    Category, ProductName, Price
+FROM
+    Products
+WHERE
+    Price > 50;
+
+-- 23.
+SELECT 
+    *
+FROM
+    Products
+WHERE
+    Price < (SELECT AVG(Price) * 0.10 FROM Products);
+
+-- 24.
+SELECT
+    *
+FROM
+    Employees
+WHERE
+    Age < 30 AND DepartmentName IN ('HR', 'IT');
+
+-- 25.
+SELECT
+    *
+FROM
+    Customers
+WHERE
+    Email LIKE '%@gmail.com%';
+
+-- 26.
+SELECT 
+    *
+FROM
+    Employees
+WHERE
+    Salary > ALL (SELECT Salary FROM Employees WHERE DepartmentName = 'Sales');
+
+-- 27.
+SELECT 
+    *
+FROM
+    Orders
+WHERE
+    OrderDate BETWEEN DATEADD(DAY, -180, (SELECT MAX(OrderDate) FROM Orders)) AND (SELECT MAX(OrderDate) FROM Orders);
