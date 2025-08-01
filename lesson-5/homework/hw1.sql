@@ -439,7 +439,7 @@ FROM
 SELECT
     Client.*
 FROM
-    Customers as Client;]
+    Customers as Client;
 
 -- 3.
 SELECT
@@ -463,7 +463,7 @@ FROM
 
 -- 5.
 SELECT DISTINCT
-    CustomerName, Country
+    FirstName, LastName, Country
 FROM
     Customers;
 
@@ -500,7 +500,7 @@ FROM
 SELECT
     ProductName
 FROM
-    Product
+    Products
 EXCEPT SELECT
     ProductName
 FROM
@@ -528,7 +528,7 @@ UPDATE
 SET
     Salary = Salary * 1.10
 WHERE
-    Department = 'HR' OR EmployeeID = 5;
+    DepartmentName = 'HR' OR EmployeeID = 5;
 
 -- 13.
 SELECT 
@@ -561,4 +561,5 @@ SELECT
         WHEN Quantity BETWEEN 2 AND 3 THEN '5%'
         ELSE '7%'
     END AS DiscountPercentage
-FROM Orders;
+FROM
+    Orders;
