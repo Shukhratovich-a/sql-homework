@@ -203,7 +203,16 @@ HAVING
     AVG(Salary) > 65000;
 
 -- 23.
-
+SELECT 
+    custid,
+    SUM(CASE WHEN freight > 50 THEN freight ELSE 0 END) AS TotalFreightOver50,
+    MIN(freight) AS LeastFreight
+FROM
+    Sales.Orders
+WHERE
+    custid IS NOT NULL
+GROUP BY
+    custid;
 
 -- 24.
 SELECT 
